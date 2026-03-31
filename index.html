@@ -785,7 +785,7 @@
         const t = e.touches[0];
         const dx = t.clientX - touchRef.current.startX;
         const dy = t.clientY - touchRef.current.startY;
-        touchRef.current.moved = true;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) touchRef.current.moved = true;
         if (!touchRef.current.swiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
           touchRef.current.swiping = true;
         }
@@ -817,8 +817,8 @@
             cardRef.current.style.transform = 'translateX(0)';
             cardRef.current.style.opacity = matches ? '1' : '';
           }
-        } else if (!touchRef.current.moved || Math.abs(touchRef.current.currentX) < 5) {
-          // Tap — no swiping happened
+        } else if (!touchRef.current.moved) {
+          // Tap — no movement at all
           onToggle();
         }
         touchRef.current.swiping = false;
