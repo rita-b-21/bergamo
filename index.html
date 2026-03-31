@@ -152,6 +152,7 @@
     }
     .myday-toggle:active { transform: scale(0.9); }
     .myday-toggle.added { background: var(--text); border-color: var(--text); color: var(--white); }
+    .activity-card:has(.myday-toggle) .card-main { padding-right: 46px; }
 
     /* My Day View */
     .myday-summary {
@@ -912,7 +913,7 @@
             {onToggleMyDay && <button className={`myday-toggle${inMyDay ? ' added' : ''}`} onClick={handleMyDayClick} onTouchEnd={handleMyDayTouch}>{inMyDay ? '\u2713' : '+'}</button>}
             {seen && <div className="seen-dot" />}
             <div className="card-main">
-              <div className="card-name" style={onToggleMyDay ? { paddingRight: '36px' } : undefined}>
+              <div className="card-name">
                 {activity.name}
                 {activity.ourPick && <span className="star">{'\u2605'}</span>}
               </div>

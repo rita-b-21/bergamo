@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bergamo-v3';
+const CACHE_NAME = 'bergamo-v4';
 const URLS = ['./index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
