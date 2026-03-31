@@ -95,8 +95,21 @@
     .badge { display: flex; align-items: center; gap: 3px; }
     .badge-glyph { font-size: 8px; }
     .badge-repeat { font-size: 10px; color: #9EAB93; }
-    .card-expand { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-    .card-expand.open { max-height: 200px; }
+    .card-expand { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .card-expand.open { max-height: 420px; }
+    .card-image-wrap {
+      position: relative; width: 100%; height: 160px; overflow: hidden;
+      border-top: 1px solid rgba(0,0,0,0.04);
+    }
+    .card-image {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: sepia(0.15) saturate(0.85); opacity: 0.92;
+    }
+    .card-image-credit {
+      position: absolute; bottom: 4px; right: 6px;
+      font-size: 8px; color: rgba(255,255,255,0.6); text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      font-family: 'Inter', sans-serif; letter-spacing: 0.02em;
+    }
     .card-tip { padding: 0 14px 11px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; border-top: 1px solid rgba(0,0,0,0.04); padding-top: 9px; font-style: italic; }
 
     @keyframes pulse-highlight {
@@ -244,6 +257,56 @@
       { id: 'iseo',    name: 'Lago d\u2019Iseo',    bg: '#B8C5C9', accent: '#8FA0A6' },
       { id: 'como',    name: 'Lago di Como',        bg: '#ADBCC8', accent: '#8499A8' },
     ];
+
+    // ── Activity Images (Wikimedia Commons thumbnails) ──
+    const IMAGE_URLS = {
+      'piazza-vecchia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/653BergamoPzaVecchia.jpg/640px-653BergamoPzaVecchia.jpg',
+      'campanone': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Bergamo_Torre_del_Comune.jpg/640px-Bergamo_Torre_del_Comune.jpg',
+      'basilica': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Bergamo_Basilica_di_Santa_Maria_Maggiore_Innen_Langhaus_2.jpg/640px-Bergamo_Basilica_di_Santa_Maria_Maggiore_Innen_Langhaus_2.jpg',
+      'cappella-colleoni': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Bergamo%2C_Cappella_Colleoni_2021.jpg/640px-Bergamo%2C_Cappella_Colleoni_2021.jpg',
+      'venetian-walls': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Bergamo_-_Panorama_dal_Baluardo_di_San_Giacomo.jpg/640px-Bergamo_-_Panorama_dal_Baluardo_di_San_Giacomo.jpg',
+      'rocca': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/131BergamoRocca.JPG/640px-131BergamoRocca.JPG',
+      'via-gombito': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Gombito.JPG/640px-Gombito.JPG',
+      'san-vigilio': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Bergamo_Alta_S_Vigilio.jpg/640px-Bergamo_Alta_S_Vigilio.jpg',
+      'stracciatella': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Stracciatella_in_Firenze.jpg/640px-Stracciatella_in_Firenze.jpg',
+      'orto-botanico': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Bergamo_orto_botanico.JPG/640px-Bergamo_orto_botanico.JPG',
+      'museo-donizetti': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/724BergamoMuseoDonizettiano.jpg/640px-724BergamoMuseoDonizettiano.jpg',
+      'baptistery': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Battistero_%28Bergamo%29.jpg/640px-Battistero_%28Bergamo%29.jpg',
+      'palazzo-podesta': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Bergamo%2C_Palazzo_del_Podest%C3%A0%2C_2016-06_CN-01.jpg/640px-Bergamo%2C_Palazzo_del_Podest%C3%A0%2C_2016-06_CN-01.jpg',
+      'la-marianna': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Bergamo_bar_La_Marianna.jpg/640px-Bergamo_bar_La_Marianna.jpg',
+      'accademia-carrara': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Accademia_Carrara_di_Bergamo.jpg/640px-Accademia_Carrara_di_Bergamo.jpg',
+      'mercato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Livorno_salone_Mercato_delle_Vettovaglie.jpg/640px-Livorno_salone_Mercato_delle_Vettovaglie.jpg',
+      'gamec': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Bergamo_-_Galleria_d%27arte_moderna_e_contemporanea_-_GAMeC.jpeg/640px-Bergamo_-_Galleria_d%27arte_moderna_e_contemporanea_-_GAMeC.jpeg',
+      'sentierone': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Sentierone_%28Bergamo%29.jpg/640px-Sentierone_%28Bergamo%29.jpg',
+      'via-xx-settembre': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Via_XX_Settembre_%28Bergamo%29_%281%29.jpg/640px-Via_XX_Settembre_%28Bergamo%29_%281%29.jpg',
+      'teatro-donizetti': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Bergamo_Teatro_Donizetti.JPG/640px-Bergamo_Teatro_Donizetti.JPG',
+      'parco-trucca': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Parco_della_Trucca._Bergamo._%287443531424%29_%282%29.jpg/640px-Parco_della_Trucca._Bergamo._%287443531424%29_%282%29.jpg',
+      'borgo-santa-caterina': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Bergamo_-_Borgo_Santa_Caterina.jpg/640px-Bergamo_-_Borgo_Santa_Caterina.jpg',
+      'santo-spirito': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Chiesa_di_Santo_Spirito_%28Bergamo%29_-_Facciata.jpg/640px-Chiesa_di_Santo_Spirito_%28Bergamo%29_-_Facciata.jpg',
+      'duomo-interior': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Milan_Cathedral_from_Piazza_del_Duomo.jpg/640px-Milan_Cathedral_from_Piazza_del_Duomo.jpg',
+      'duomo-rooftop': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Duomo_Milano_guglie_di_notte.JPG/640px-Duomo_Milano_guglie_di_notte.JPG',
+      'galleria': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Galleria_Milano_%28179532365%29.jpeg/640px-Galleria_Milano_%28179532365%29.jpeg',
+      'brera-museum': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Pinacoteca_di_Brera_0100_01.jpg/640px-Pinacoteca_di_Brera_0100_01.jpg',
+      'brera-neighbourhood': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Brera_-_via_Madonnina.jpg/640px-Brera_-_via_Madonnina.jpg',
+      'navigli': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Naviglio_Grande%2C_Milano.jpg/640px-Naviglio_Grande%2C_Milano.jpg',
+      'castello': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Castello_sforzesco%2C_milano.JPG/640px-Castello_sforzesco%2C_milano.JPG',
+      'cenacolo': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Cenacolo_Vinciano%2C_Santuario_di_Santa_Maria_delle_Grazie%2C_Milano_%2830824242905%29.jpg/640px-Cenacolo_Vinciano%2C_Santuario_di_Santa_Maria_delle_Grazie%2C_Milano_%2830824242905%29.jpg',
+      'cimitero': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/16-11-30_Cimitero_Monumentale_Milano_RR2_7540.jpg/640px-16-11-30_Cimitero_Monumentale_Milano_RR2_7540.jpg',
+      'fondazione-prada': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Fondazione_PRADA%2C_Milano_Via_Ripamonti_-_Largo_Isarco_area%2C_Rem_Koolhaas_design.jpg/640px-Fondazione_PRADA%2C_Milano_Via_Ripamonti_-_Largo_Isarco_area%2C_Rem_Koolhaas_design.jpg',
+      'parco-sempione': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Parco_Sempione_-_Milano%2C_2023.jpg/640px-Parco_Sempione_-_Milano%2C_2023.jpg',
+      'eataly': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Expo_milano_2015%2C_mostra_il_tesoro_d%27italia_%28eataly%29%2C_lombardia.JPG/640px-Expo_milano_2015%2C_mostra_il_tesoro_d%27italia_%28eataly%29%2C_lombardia.JPG',
+      'iseo-town': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Iseo-lake-italy-dawid-tkocz.jpg/640px-Iseo-lake-italy-dawid-tkocz.jpg',
+      'monte-isola': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/MonteIsola_Lago_d%27Iseo_sud.jpg/640px-MonteIsola_Lago_d%27Iseo_sud.jpg',
+      'madonna-ceriola': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Santuario_della_Madonna_della_Ceriola.jpg/640px-Santuario_della_Madonna_della_Ceriola.jpg',
+      'pisogne': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Santa_Maria_della_Neve_Pisogne_1.JPG/640px-Santa_Maria_della_Neve_Pisogne_1.JPG',
+      'sarnico': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Sarnico_vista_02.jpg/640px-Sarnico_vista_02.jpg',
+      'pyramids-zone': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Piramidi_di_Zone.JPG/640px-Piramidi_di_Zone.JPG',
+      'lovere': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Lovere_vista.JPG/640px-Lovere_vista.JPG',
+      'varenna': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Varenna_and_mountain_from_ferry.jpg/640px-Varenna_and_mountain_from_ferry.jpg',
+      'villa-monastero': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Villa_monastero.jpg/640px-Villa_monastero.jpg',
+      'bellagio': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Town_of_Bellagio_%28Lake_Como%29_seen_from_the_lake_%2836722979021%29.jpg/640px-Town_of_Bellagio_%28Lake_Como%29_seen_from_the_lake_%2836722979021%29.jpg',
+      'lecco': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Lecco_Grigna.jpg/640px-Lecco_Grigna.jpg',
+    };
 
     /* ═══════════════════════════════════════
        ACTIVITIES  (46)
@@ -926,6 +989,10 @@
               </div>
             </div>
             <div className={`card-expand${isExpanded ? ' open' : ''}`}>
+              {isExpanded && IMAGE_URLS[activity.id] && <div className="card-image-wrap">
+                <img className="card-image" src={IMAGE_URLS[activity.id]} alt={activity.name} loading="lazy" onError={(e) => { e.target.parentElement.style.display = 'none'; }} />
+                <span className="card-image-credit">Wikimedia Commons</span>
+              </div>}
               <div className="card-tip">{activity.tip}</div>
             </div>
           </div>
