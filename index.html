@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Bergamo" />
+  <meta name="theme-color" content="#2C2520" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Bergamo &middot; Aprile 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F5F0E8; --text: #2C2520; --text-muted: #7A7068; --text-light: #A09688;
+      --white: #FDFCFA; --radius: 6px; --transition: 0.25s ease;
+    }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 14px; line-height: 1.5; color: var(--text);
+      background-color: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 72px;
+    }
+    h1,h2,h3,.zone-title,.header-title,.practical-title,.section-divider,.restaurant-zone-label,.surprise-fab {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .header { text-align: center; padding: 20px 16px 8px; }
+    .header-title { font-size: 28px; font-weight: 700; letter-spacing: 0.02em; }
+    .header-sub { font-size: 12px; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; }
+
+    /* Mood Picker */
+    .mood-picker {
+      position: sticky; top: 0; z-index: 20; background: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      padding: 8px 16px 10px; border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .filter-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+    .filter-row:last-child { margin-bottom: 0; }
+    .filter-row-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-light); margin-bottom: 2px; font-weight: 500; }
+    .filter-btn {
+      flex: 1 1 0; min-width: 0; min-height: 34px; border: 1.5px solid rgba(0,0,0,0.1);
+      border-radius: 20px; background: var(--white); color: var(--text-muted);
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all var(--transition); -webkit-tap-highlight-color: transparent;
+      padding: 0 4px;
+    }
+    .filter-btn.active { background: var(--text); color: var(--white); border-color: var(--text); }
+    .more-filters-toggle {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      font-size: 11px; color: var(--text-light); cursor: pointer; padding: 4px 0 0;
+      -webkit-tap-highlight-color: transparent; user-select: none;
+    }
+    .more-filters-toggle .chevron { transition: transform 0.2s ease; display: inline-block; font-size: 10px; }
+    .more-filters-toggle .chevron.open { transform: rotate(180deg); }
+    .extra-filters { overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease; }
+
+    /* Zone Sections */
+    .zone-section { margin-bottom: 2px; }
+    .zone-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none;
+    }
+    .zone-title { font-size: 22px; font-weight: 600; letter-spacing: 0.01em; }
+    .zone-count { font-size: 12px; color: var(--text-muted); margin-left: 8px; font-family: 'Inter', sans-serif; }
+    .zone-chevron { font-size: 14px; color: var(--text-muted); transition: transform 0.3s ease; }
+    .zone-chevron.collapsed { transform: rotate(-90deg); }
+    .zone-cards { overflow: hidden; transition: max-height 0.4s ease; }
+    .zone-cards-inner { padding: 6px 12px 12px; }
+
+    /* Activity Cards */
+    .activity-card-wrapper { overflow: hidden; transition: max-height 0.3s ease, margin 0.3s ease, opacity 0.3s ease; margin-bottom: 8px; }
+    .activity-card-wrapper.dismissing { max-height: 0 !important; margin-bottom: 0; opacity: 0; }
+    .activity-card {
+      background: var(--white); border-radius: var(--radius);
+      border-left: 4px solid transparent; overflow: hidden;
+      transition: opacity var(--transition); position: relative;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .activity-card.faded { opacity: 0.07; pointer-events: none; }
+    .card-main { padding: 11px 14px; }
+    .card-name { font-weight: 500; font-size: 14px; line-height: 1.3; display: flex; align-items: center; gap: 4px; }
+    .card-name .star { color: #D4A843; }
+    .seen-dot { width: 6px; height: 6px; border-radius: 50%; background: #C4A882; position: absolute; top: 8px; right: 8px; opacity: 0.5; }
+    .card-detail { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+    .card-directions { font-size: 11px; color: var(--text-light); margin-top: 3px; font-style: italic; }
+    .card-badges { display: flex; gap: 8px; margin-top: 5px; font-size: 11px; color: var(--text-light); align-items: center; flex-wrap: wrap; }
+    .badge { display: flex; align-items: center; gap: 3px; }
+    .badge-glyph { font-size: 8px; }
+    .badge-repeat { font-size: 10px; color: #9EAB93; }
+    .card-expand { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .card-expand.open { max-height: 200px; }
+    .card-tip { padding: 0 14px 11px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; border-top: 1px solid rgba(0,0,0,0.04); padding-top: 9px; font-style: italic; }
+
+    @keyframes pulse-highlight {
+      0% { box-shadow: 0 0 0 0 rgba(212,168,67,0.5); }
+      50% { box-shadow: 0 0 0 8px rgba(212,168,67,0); }
+      100% { box-shadow: 0 0 0 0 rgba(212,168,67,0); }
+    }
+    .activity-card.highlighted { animation: pulse-highlight 0.6s ease 2; }
+
+    /* Practical */
+    .practical-section { padding: 0 16px; }
+    .practical-card { background: var(--white); border-radius: var(--radius); padding: 13px 16px; margin-bottom: 10px; }
+    .practical-title { font-size: 17px; font-weight: 600; margin-bottom: 5px; }
+    .practical-line { font-size: 13px; color: var(--text-muted); line-height: 1.6; padding-left: 10px; position: relative; }
+    .practical-line::before { content: '\2022'; position: absolute; left: 0; color: var(--text-light); }
+    .restaurant-zone-label { font-size: 18px; font-weight: 600; padding: 14px 0 6px; border-bottom: 1px solid rgba(0,0,0,0.06); margin-bottom: 8px; }
+    .restaurant-card { background: var(--white); border-radius: var(--radius); padding: 11px 14px; margin-bottom: 8px; }
+    .restaurant-name { font-weight: 500; font-size: 14px; }
+    .restaurant-price { font-size: 11px; color: var(--text-light); margin-left: 6px; }
+    .restaurant-order { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+    .restaurant-detail { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+    .section-divider { font-size: 20px; font-weight: 700; padding: 20px 16px 8px; color: var(--text); }
+    .food-sheet { background: var(--white); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
+    .food-item { margin-bottom: 8px; } .food-item:last-child { margin-bottom: 0; }
+    .food-name { font-weight: 500; font-size: 13px; }
+    .food-desc { font-size: 12px; color: var(--text-muted); }
+
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex;
+      background: var(--white); border-top: 1px solid rgba(0,0,0,0.08);
+      z-index: 30; padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 10px 0 8px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      transition: color var(--transition); color: var(--text-light);
+      font-size: 11px; font-weight: 500; letter-spacing: 0.03em;
+      border-top: 2.5px solid transparent; user-select: none;
+    }
+    .tab.active { color: var(--text); border-top-color: var(--text); }
+    .tab-icon { font-size: 18px; margin-bottom: 2px; }
+
+    /* Surprise Me */
+    .surprise-fab {
+      position: fixed; bottom: 76px; right: 16px; z-index: 25;
+      background: var(--bg); color: var(--text); border: 1.5px solid rgba(44,37,32,0.25);
+      border-radius: 24px; padding: 9px 18px;
+      font-size: 15px; font-weight: 600; letter-spacing: 0.01em;
+      cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      -webkit-tap-highlight-color: transparent; transition: transform 0.2s ease;
+    }
+    .surprise-fab:active { transform: scale(0.95); }
+
+    /* Undo Toast */
+    .undo-toast {
+      position: fixed; bottom: 76px; left: 16px; right: 90px; z-index: 25;
+      background: var(--text); color: var(--white); border-radius: 8px;
+      padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; box-shadow: 0 2px 12px rgba(0,0,0,0.2); animation: toast-in 0.3s ease;
+    }
+    @keyframes toast-in { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .undo-btn {
+      background: none; border: 1px solid rgba(255,255,255,0.3); color: var(--white);
+      border-radius: 4px; padding: 4px 12px; font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 500; cursor: pointer; margin-left: 12px; white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+
+    // ── Zones ──
+    const ZONES = [
+      { id: 'alta',    name: 'Citt\u00e0 Alta',    bg: '#E8D5B7', accent: '#C4A882' },
+      { id: 'bassa',   name: 'Citt\u00e0 Bassa',   bg: '#EDE8DD', accent: '#C9C1B0' },
+      { id: 'milano',  name: 'Milano',              bg: '#C5CEBD', accent: '#9EAB93' },
+      { id: 'iseo',    name: 'Lago d\u2019Iseo',    bg: '#B8C5C9', accent: '#8FA0A6' },
+      { id: 'como',    name: 'Lago di Como',        bg: '#ADBCC8', accent: '#8499A8' },
+    ];
+
+    /* ═══════════════════════════════════════
+       ACTIVITIES  (46)
+       Energy rebalanced: low ~14 · med ~26 · high ~6
+       Low  = genuinely chill: sitting, quick drop-ins, standing in one place
+       Med  = typical tourism: walking, museums, some stairs, markets
+       High = real effort: long hikes, island exploration, steep climbs, all-day treks
+       ═══════════════════════════════════════ */
+    const ACTIVITIES = [
+      // ─── CITTÀ ALTA (14) ───
+      { id: 'piazza-vecchia', name: 'Piazza Vecchia', zone: 'alta',
+        detail: 'One of Italy\u2019s finest medieval squares. Linger, but the caf\u00e9s are tourist-priced.',
+        tip: 'Have your espresso and move on \u2014 the square is for looking, not for paying \u20ac5 for a coffee.',
+        directions: 'Top of the funicular, 2 min walk via Via Gombito',
+        energy: 'low', setting: 'outdoor', free: true, price: null, time: 'Any amount of time',
+        ourPick: false, timeOfDay: ['morning','afternoon','golden_hour','evening'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: true },
+
+      { id: 'campanone', name: 'Campanone (Civic Tower)', zone: 'alta',
+        detail: 'Panoramic views over both cities and, on a clear day, the Alps.',
+        tip: 'Go on a clear morning for the best Alpine views. 100 bells still ring at 22:00 every night.',
+        directions: 'On Piazza Vecchia \u2014 look up',
+        energy: 'med', setting: 'outdoor', free: false, price: '~\u20ac5', time: '30\u201345 min',
+        ourPick: true, timeOfDay: ['morning'], duration: 'quick',
+        vibe: ['adventurous'], repeatWorthy: false },
+
+      { id: 'basilica', name: 'Basilica di Santa Maria Maggiore', zone: 'alta',
+        detail: 'Romanesque exterior, wildly ornate interior. Extraordinary inlaid wood choir stalls.',
+        tip: 'Don\u2019t skip it. The Lotto tapestries and choir stalls are among the best in Lombardy.',
+        directions: 'South side of Piazza Duomo, behind Piazza Vecchia',
+        energy: 'med', setting: 'indoor', free: true, price: null, time: '30\u201345 min',
+        ourPick: true, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'cappella-colleoni', name: 'Cappella Colleoni', zone: 'alta',
+        detail: 'Renaissance funerary chapel \u2014 pink and white marble, extravagant and beautiful.',
+        tip: 'One of the best Renaissance buildings in Lombardy. Next door to the Basilica \u2014 do both together.',
+        directions: 'Next to the Basilica on Piazza Duomo',
+        energy: 'med', setting: 'indoor', free: false, price: '~\u20ac3', time: '20\u201330 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'venetian-walls', name: 'Venetian Walls (Le Mura)', zone: 'alta',
+        detail: 'UNESCO World Heritage. Walk a section or the full 6 km circuit.',
+        tip: 'The stretch from Porta San Giacomo to Porta San Lorenzo has the best views. Great early morning or late afternoon.',
+        directions: 'Start at Porta San Giacomo, south side of Citt\u00e0 Alta',
+        energy: 'high', setting: 'outdoor', free: true, price: null, time: '30 min\u20132 hrs',
+        ourPick: true, timeOfDay: ['morning','golden_hour'], duration: 'quick',
+        vibe: ['adventurous','romantic'], repeatWorthy: true },
+
+      { id: 'rocca', name: 'Rocca di Bergamo', zone: 'alta',
+        detail: 'Hilltop fortress at the east end. Excellent viewpoint over both cities.',
+        tip: 'The terrace is the thing \u2014 skip the small Risorgimento museum inside unless you\u2019re keen.',
+        directions: '10 min walk east from Piazza Vecchia',
+        energy: 'med', setting: 'outdoor', free: true, price: 'Grounds free', time: '30\u201360 min',
+        ourPick: false, timeOfDay: ['afternoon','golden_hour'], duration: 'quick',
+        vibe: ['adventurous'], repeatWorthy: false },
+
+      { id: 'via-gombito', name: 'Via Gombito & Via Colleoni', zone: 'alta',
+        detail: 'Main pedestrian streets. Food shops, ceramics, local cheese and salumi.',
+        tip: 'Less touristy than they look once you get past the first 50 metres. Good for polenta flour and local cheese.',
+        directions: 'The two main streets through Citt\u00e0 Alta \u2014 from the funicular to Piazza Vecchia and beyond',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: 'As long as you like',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['wander','food_drink'], repeatWorthy: true },
+
+      { id: 'san-vigilio', name: 'San Vigilio', zone: 'alta',
+        detail: 'Quiet hilltop hamlet via the second funicular. Ruined castle, sweeping views.',
+        tip: 'Barely touristy. A good escape from even the modest crowds of Citt\u00e0 Alta. Pack a picnic.',
+        directions: 'Funicolare San Vigilio from Via San Vigilio, near Porta Sant\u2019Alessandro',
+        energy: 'high', setting: 'outdoor', free: true, price: null, time: 'Half a morning/afternoon',
+        ourPick: true, timeOfDay: ['morning','afternoon'], duration: 'half_day',
+        vibe: ['romantic','adventurous'], repeatWorthy: false },
+
+      { id: 'stracciatella', name: 'Stracciatella gelato', zone: 'alta',
+        detail: 'Invented in Bergamo. Vanilla with melted dark chocolate ribbons.',
+        tip: 'Get one at any gelateria in Citt\u00e0 Alta \u2014 it\u2019s consistently excellent everywhere.',
+        directions: 'Any gelateria in Citt\u00e0 Alta',
+        energy: 'low', setting: 'either', free: false, price: '~\u20ac3', time: '10 min',
+        ourPick: true, timeOfDay: ['afternoon'], duration: 'quick',
+        vibe: ['food_drink'], repeatWorthy: true },
+
+      { id: 'orto-botanico', name: 'Orto Botanico Lorenzo Rota', zone: 'alta',
+        detail: 'Small hilltop botanical garden with views over the plain. Free, peaceful, usually empty.',
+        tip: 'Two sections: a lower garden off Colle Aperto and an upper one near Astino. The lower one is the quick, easy visit.',
+        directions: 'Scaletta di Colle Aperto, just past Piazza della Cittadella',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '30\u201345 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['romantic','wander'], repeatWorthy: false },
+
+      { id: 'museo-donizetti', name: 'Museo Donizetti', zone: 'alta',
+        detail: 'Small museum dedicated to Gaetano Donizetti, Bergamo\u2019s great opera composer. Manuscripts, pianos, personal objects.',
+        tip: 'Worth 30 minutes if you have any interest in opera. The building itself is a 15th-century palace.',
+        directions: 'Via Arena, off Via Colleoni in Citt\u00e0 Alta',
+        energy: 'med', setting: 'indoor', free: false, price: '~\u20ac5', time: '30\u201345 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'baptistery', name: 'Baptistery', zone: 'alta',
+        detail: '14th-century octagonal baptistery, originally inside the Basilica, moved outside in the 1800s.',
+        tip: 'Easy to miss \u2014 it\u2019s the small octagonal structure in Piazza Duomo. Take 10 minutes while you\u2019re at the Basilica.',
+        directions: 'Piazza Duomo, between the Basilica and the cathedral',
+        energy: 'low', setting: 'outdoor', free: true, price: null, time: '10\u201315 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'palazzo-podesta', name: 'Palazzo del Podest\u00e0', zone: 'alta',
+        detail: 'Museum with underground Roman and medieval archaeology beneath Piazza Vecchia.',
+        tip: 'Good rainy-day option. Layers of the city visible beneath your feet.',
+        directions: 'On Piazza Vecchia \u2014 entrance on the square',
+        energy: 'med', setting: 'indoor', free: false, price: '~\u20ac5', time: '45\u201360 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'la-marianna', name: 'La Marianna', zone: 'alta',
+        detail: 'The gelateria that invented stracciatella gelato in 1961. Still family-run, still excellent.',
+        tip: 'Sit on the terrace for views over the plain while you eat. The stracciatella is the obvious order.',
+        directions: 'Largo Colle Aperto, 1 min from the funicular exit',
+        energy: 'low', setting: 'either', free: false, price: '~\u20ac3\u20135', time: '15\u201320 min',
+        ourPick: true, timeOfDay: ['afternoon','golden_hour'], duration: 'quick',
+        vibe: ['food_drink','romantic'], repeatWorthy: true },
+
+      // ─── CITTÀ BASSA (9) ───
+      { id: 'accademia-carrara', name: 'Accademia Carrara', zone: 'bassa',
+        detail: 'Great underrated art museum. Botticelli, Raphael, Mantegna, Lotto, Moroni.',
+        tip: 'Don\u2019t miss Giovanni Battista Moroni\u2019s portraits \u2014 he was from Bergamo and the collection here is unmatched.',
+        directions: 'Piazza Giacomo Carrara, 15 min walk east from the funicular station',
+        energy: 'med', setting: 'indoor', free: false, price: '~\u20ac10', time: '1.5\u20132 hrs',
+        ourPick: true, timeOfDay: ['morning'], duration: 'half_day',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'mercato', name: 'Mercato delle Vettovaglie', zone: 'bassa',
+        detail: 'Authentic local covered market. Cheese, bread, salumi, fruit.',
+        tip: 'Go in the morning. Stock the apartment or put together a picnic. Via Borfuro.',
+        directions: 'Via Borfuro, 10 min walk from the funicular station',
+        energy: 'med', setting: 'indoor', free: true, price: null, time: '30\u201360 min',
+        ourPick: true, timeOfDay: ['morning'], duration: 'quick',
+        vibe: ['food_drink'], repeatWorthy: true },
+
+      { id: 'gamec', name: 'GAMeC', zone: 'bassa',
+        detail: 'Gallery of Modern & Contemporary Art. 20th-century Italian work.',
+        tip: 'Right next to the Accademia Carrara \u2014 combine both in a half-day.',
+        directions: 'Via San Tomaso 53, next door to Accademia Carrara',
+        energy: 'med', setting: 'indoor', free: false, price: '~\u20ac10', time: '1\u20131.5 hrs',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'sentierone', name: 'Sentierone & Piazza Matteotti', zone: 'bassa',
+        detail: 'Elegant central boulevard. Good for people-watching and the evening passeggiata.',
+        tip: 'The colonnaded street has decent bars. Best at golden hour.',
+        directions: 'Central boulevard, 5 min walk south from the funicular station',
+        energy: 'low', setting: 'outdoor', free: true, price: null, time: '30 min stroll',
+        ourPick: false, timeOfDay: ['golden_hour','evening'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: true },
+
+      { id: 'via-xx-settembre', name: 'Via XX Settembre', zone: 'bassa',
+        detail: 'Main shopping street. Mix of chains and independent shops.',
+        tip: 'Good for practical purchases or browsing. Not a destination, but useful.',
+        directions: 'Starts at Porta Nuova, the main gate to Citt\u00e0 Bassa',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: 'As long as you like',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: false },
+
+      { id: 'teatro-donizetti', name: 'Teatro Donizetti', zone: 'bassa',
+        detail: 'Bergamo\u2019s opera house, named after its most famous son. Neoclassical interior worth seeing.',
+        tip: 'Check the April programme at teatrodonizetti.it \u2014 even a lesser-known opera in this setting is memorable.',
+        directions: 'Piazza Cavour, central Citt\u00e0 Bassa, 5 min walk from the Sentierone',
+        energy: 'low', setting: 'indoor', free: false, price: 'Varies', time: '2\u20133 hrs',
+        ourPick: false, timeOfDay: ['evening'], duration: 'half_day',
+        vibe: ['cultural','romantic'], repeatWorthy: false },
+
+      { id: 'parco-trucca', name: 'Parco della Trucca', zone: 'bassa',
+        detail: 'Bergamo\u2019s largest urban park. Green, flat, good for a slow morning when you need a break from cobblestones.',
+        tip: 'Not a tourist attraction \u2014 that\u2019s the point. Locals walking dogs, joggers. Bring coffee from a bar.',
+        directions: 'Western Bergamo, 10 min by ATB bus from the centre',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '1\u20132 hrs',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: true },
+
+      { id: 'borgo-santa-caterina', name: 'Borgo Santa Caterina', zone: 'bassa',
+        detail: 'A real working neighbourhood with bakeries, fruit shops, and zero tourists.',
+        tip: 'Best in the morning when the shops are open. Look for a forno (bakery) for fresh bread and pastries.',
+        directions: 'East of the centre, walkable from the Accademia Carrara area',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '1\u20132 hrs',
+        ourPick: false, timeOfDay: ['morning'], duration: 'quick',
+        vibe: ['wander','food_drink'], repeatWorthy: true },
+
+      { id: 'santo-spirito', name: 'Chiesa di Santo Spirito', zone: 'bassa',
+        detail: 'A quiet church with a Lorenzo Lotto altarpiece. Nobody goes \u2014 you\u2019ll likely have it to yourself.',
+        tip: 'Combine with a visit to the Accademia Carrara, which is 5 minutes away.',
+        directions: 'Via Torquato Tasso, 5 min walk from Accademia Carrara',
+        energy: 'low', setting: 'indoor', free: true, price: null, time: '15\u201320 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      // ─── MILANO (12) ───
+      { id: 'duomo-interior', name: 'Duomo interior', zone: 'milano',
+        detail: 'Milan\u2019s cathedral. The interior is free \u2014 vast, dim, and impressive.',
+        tip: 'The interior is free. Save your money for the rooftop.',
+        directions: 'Metro M3 from Milano Centrale to Duomo, ~15 min',
+        energy: 'low', setting: 'indoor', free: true, price: null, time: '30\u201345 min',
+        ourPick: false, timeOfDay: ['morning'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'duomo-rooftop', name: 'Duomo rooftop', zone: 'milano',
+        detail: 'A maze of spires you can walk among. One of Milan\u2019s great experiences.',
+        tip: 'Do the stairs \u2014 they\u2019re fine and you save \u20ac5. Go early to beat queues.',
+        directions: 'Entrance on the north side of the cathedral',
+        energy: 'med', setting: 'outdoor', free: false, price: '~\u20ac15 stairs', time: '45\u201360 min',
+        ourPick: true, timeOfDay: ['morning'], duration: 'quick',
+        vibe: ['adventurous'], repeatWorthy: false },
+
+      { id: 'galleria', name: 'Galleria Vittorio Emanuele II', zone: 'milano',
+        detail: 'Enormous glass-roofed 19th-century arcade. Stunning architecture, free to walk through.',
+        tip: 'The shops are all unaffordable but beautiful to look at. 15 minutes is enough.',
+        directions: 'North side of Piazza del Duomo \u2014 you can\u2019t miss it',
+        energy: 'low', setting: 'indoor', free: true, price: null, time: '15 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: false },
+
+      { id: 'brera-museum', name: 'Pinacoteca di Brera', zone: 'milano',
+        detail: 'One of Italy\u2019s great painting collections. Raphael, Mantegna, Caravaggio.',
+        tip: 'Worth it if you\u2019re interested in painting. Allow 1.5\u20132 hours in the Brera neighbourhood.',
+        directions: 'Via Brera 28, 10 min walk north from Duomo',
+        energy: 'med', setting: 'indoor', free: false, price: '~\u20ac15', time: '1.5\u20132 hrs',
+        ourPick: true, timeOfDay: ['morning','afternoon'], duration: 'half_day',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'brera-neighbourhood', name: 'Brera neighbourhood', zone: 'milano',
+        detail: 'Milan\u2019s most liveable quarter. Independent shops, vintage, art spaces, good lunch spots.',
+        tip: 'Less overwhelming than the Duomo area. Great for a tavola calda lunch (~\u20ac10\u201312).',
+        directions: 'Around Via Brera and Via Fiori Chiari, north of Duomo',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '1\u20132 hrs',
+        ourPick: true, timeOfDay: ['afternoon'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: true },
+
+      { id: 'navigli', name: 'Navigli aperitivo', zone: 'milano',
+        detail: 'Milan\u2019s canal district. Arrive at 18:00, order a drink, eat from the free buffet.',
+        tip: 'This is both an experience and legitimately a meal. ~\u20ac8\u201310 for a drink + full buffet.',
+        directions: 'Metro M2 to Porta Genova, 5 min walk to Naviglio Grande',
+        energy: 'low', setting: 'outdoor', free: false, price: '~\u20ac8\u201310', time: 'Evening',
+        ourPick: true, timeOfDay: ['evening'], duration: 'half_day',
+        vibe: ['food_drink','romantic'], repeatWorthy: true },
+
+      { id: 'castello', name: 'Castello Sforzesco', zone: 'milano',
+        detail: '15th-century castle. Grounds are free. Museums include Michelangelo\u2019s Rondanini Piet\u00e0.',
+        tip: 'The grounds are nice to wander for free. The Rondanini Piet\u00e0 inside (~\u20ac5) is extraordinary if you make the trip.',
+        directions: '10 min walk northwest from Duomo along Via Dante',
+        energy: 'med', setting: 'either', free: true, price: 'Grounds free', time: '30\u201390 min',
+        ourPick: false, timeOfDay: ['afternoon'], duration: 'quick',
+        vibe: ['cultural','wander'], repeatWorthy: false },
+
+      { id: 'cenacolo', name: 'Cenacolo Vinciano (Last Supper)', zone: 'milano',
+        detail: 'Leonardo da Vinci\u2019s Last Supper. The single most significant artwork in Milan. Timed 15-minute viewings.',
+        tip: 'Must book weeks ahead at cenacolovinciano.org. Slots sell out fast. If available, unmissable.',
+        directions: 'Piazza Santa Maria delle Grazie. Metro M1 to Conciliazione, 5 min walk',
+        energy: 'low', setting: 'indoor', free: false, price: '~\u20ac15', time: '30 min (timed)',
+        ourPick: true, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'cimitero', name: 'Cimitero Monumentale', zone: 'milano',
+        detail: 'An open-air sculpture museum disguised as a cemetery. Extraordinary monuments. Free.',
+        tip: 'Take it seriously as an art visit. The Famedio (main building) houses tombs of Milan\u2019s great figures.',
+        directions: 'Piazzale Cimitero Monumentale. Metro M5 (purple) to Monumentale',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '1\u20131.5 hrs',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'fondazione-prada', name: 'Fondazione Prada', zone: 'milano',
+        detail: 'Rem Koolhaas-designed contemporary art complex. Bold architecture and ambitious exhibitions.',
+        tip: 'Bar Luce (designed by Wes Anderson) is inside \u2014 worth a coffee even if you skip the exhibitions.',
+        directions: 'Largo Isarco 2. Metro M3 to Lodi T.I.B.B., then 10 min walk south',
+        energy: 'med', setting: 'indoor', free: false, price: '~\u20ac15', time: '2\u20133 hrs',
+        ourPick: false, timeOfDay: ['afternoon'], duration: 'half_day',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'parco-sempione', name: 'Parco Sempione', zone: 'milano',
+        detail: 'Milan\u2019s central park. A good decompression stop between museum visits.',
+        tip: 'Enter through Castello Sforzesco, walk to the Arco della Pace at the far end. Combine with the castle.',
+        directions: 'Behind Castello Sforzesco \u2014 enter through the castle courtyard',
+        energy: 'low', setting: 'outdoor', free: true, price: null, time: '30\u201360 min',
+        ourPick: false, timeOfDay: ['afternoon'], duration: 'quick',
+        vibe: ['wander','romantic'], repeatWorthy: true },
+
+      { id: 'eataly', name: 'Eataly Smeraldo', zone: 'milano',
+        detail: 'Not just a shop \u2014 quality food counters for a quick, good lunch. Pasta, pizza, gelato, wine.',
+        tip: 'Good for a quick quality lunch between sights. The pasta counter is usually the best value.',
+        directions: 'Piazza XXV Aprile. Metro M2 to Garibaldi, 5 min walk',
+        energy: 'low', setting: 'indoor', free: true, price: null, time: '30\u201360 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['food_drink'], repeatWorthy: true },
+
+      // ─── LAGO D'ISEO (7) ───
+      { id: 'iseo-town', name: 'Iseo town promenade', zone: 'iseo',
+        detail: 'Main town on Lake Iseo. Nice lakeside promenade, good for coffee.',
+        tip: 'Explore before or after Monte Isola. The promenade is pleasant but the island is the highlight.',
+        directions: 'Train to Iseo via Brescia, ~1h45min from Bergamo',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '30\u201360 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: false },
+
+      { id: 'monte-isola', name: 'Monte Isola ferry', zone: 'iseo',
+        detail: 'Car-free island in Lake Iseo. Fishing villages, olive groves, lake views.',
+        tip: 'Ferries run frequently from Iseo. Lunch on the island: fresh lake fish (tinca, lavarello) is the local speciality.',
+        directions: 'Ferry from Iseo town dock, runs frequently',
+        energy: 'high', setting: 'outdoor', free: false, price: '~\u20ac4.20 return', time: 'Half a day',
+        ourPick: true, timeOfDay: ['morning'], duration: 'half_day',
+        vibe: ['adventurous'], repeatWorthy: false },
+
+      { id: 'madonna-ceriola', name: 'Madonna della Ceriola hike', zone: 'iseo',
+        detail: '45-min hike through olive groves to the church at the top of Monte Isola.',
+        tip: 'Sweeping lake views from the top. Combine with the Monte Isola ferry trip.',
+        directions: '45 min hike from Peschiera Maraglio dock on Monte Isola',
+        energy: 'high', setting: 'outdoor', free: true, price: null, time: '45 min up',
+        ourPick: true, timeOfDay: ['morning'], duration: 'half_day',
+        vibe: ['adventurous'], repeatWorthy: false },
+
+      { id: 'pisogne', name: 'Pisogne church frescoes', zone: 'iseo',
+        detail: 'Santa Maria della Neve \u2014 beautiful frescoed church in a quiet village on Lake Iseo.',
+        tip: 'Free entry. Reachable by train if you have extra time on the lake day.',
+        directions: 'Train further up the Lake Iseo line from Iseo or Brescia',
+        energy: 'low', setting: 'indoor', free: true, price: null, time: '30\u201345 min',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['cultural'], repeatWorthy: false },
+
+      { id: 'sarnico', name: 'Sarnico', zone: 'iseo',
+        detail: 'Art Nouveau lakeside town at the south end of Lake Iseo. Quieter and more refined than Iseo town.',
+        tip: 'Look for Villa Faccanoni on the lakeshore \u2014 a beautiful Art Nouveau building. A different mood from the northern lake.',
+        directions: 'Bus from Bergamo bus station (Autolinee), ~50 min',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '2\u20133 hrs',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'half_day',
+        vibe: ['wander','romantic'], repeatWorthy: false },
+
+      { id: 'pyramids-zone', name: 'Pyramids of Zone', zone: 'iseo',
+        detail: 'Surreal earth-pillar formations \u2014 tall columns of glacial debris capped by boulders. A short but steep hike.',
+        tip: 'Combine with a Lake Iseo day. Get off at Marone, hike up, then continue to Iseo by the next train.',
+        directions: 'Train to Marone on the Lake Iseo line, then 30 min uphill walk to Zone',
+        energy: 'high', setting: 'outdoor', free: true, price: null, time: '2\u20133 hrs',
+        ourPick: false, timeOfDay: ['morning'], duration: 'half_day',
+        vibe: ['adventurous'], repeatWorthy: false },
+
+      { id: 'lovere', name: 'Lovere', zone: 'iseo',
+        detail: 'Beautiful town at the north end of Lake Iseo. Accademia Tadini art gallery, medieval lanes.',
+        tip: 'The Accademia Tadini (~\u20ac5) is a small but genuinely good art collection. The town itself is worth the trip.',
+        directions: 'Bus from Bergamo bus station, ~1.5 hrs',
+        energy: 'high', setting: 'outdoor', free: true, price: null, time: '3\u20134 hrs',
+        ourPick: false, timeOfDay: ['morning'], duration: 'half_day',
+        vibe: ['cultural','wander'], repeatWorthy: false },
+
+      // ─── LAGO DI COMO (4) ───
+      { id: 'varenna', name: 'Varenna', zone: 'como',
+        detail: 'Most atmospheric stop on Como\u2019s eastern shore. Narrow lanes, floating lakeside walkway.',
+        tip: 'The Passeggiata degli Innamorati (floating walkway) is lovely. Cheaper and quieter than Bellagio.',
+        directions: 'Train Bergamo \u2192 Lecco \u2192 Varenna, ~1h45min total (change at Lecco)',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: 'Half to full day',
+        ourPick: true, timeOfDay: ['morning'], duration: 'half_day',
+        vibe: ['romantic'], repeatWorthy: false },
+
+      { id: 'villa-monastero', name: 'Villa Monastero gardens', zone: 'como',
+        detail: 'Lakeside gardens in Varenna with beautiful plantings and lake views.',
+        tip: '\u20ac7 entry. Worth it for the gardens alone if you\u2019re already in Varenna.',
+        directions: 'Southern end of Varenna, 5 min walk from the ferry dock',
+        energy: 'med', setting: 'outdoor', free: false, price: '~\u20ac7', time: '1\u20131.5 hrs',
+        ourPick: false, timeOfDay: ['afternoon'], duration: 'quick',
+        vibe: ['romantic'], repeatWorthy: false },
+
+      { id: 'bellagio', name: 'Bellagio (ferry)', zone: 'como',
+        detail: 'The prettiest town on Lake Como. Ferry from Varenna ~\u20ac6 return.',
+        tip: 'Worth a brief visit \u2014 the ferry ride itself is lovely. Lunch here or in Varenna (cheaper).',
+        directions: 'Ferry from Varenna, ~15 min crossing',
+        energy: 'med', setting: 'outdoor', free: false, price: '~\u20ac6 ferry', time: '1.5\u20132 hrs',
+        ourPick: false, timeOfDay: ['afternoon'], duration: 'half_day',
+        vibe: ['romantic','wander'], repeatWorthy: false },
+
+      { id: 'lecco', name: 'Lecco lakefront', zone: 'como',
+        detail: 'Southern tip of Como\u2019s eastern branch. Dramatic mountain backdrop, genuinely appealing.',
+        tip: 'Good as a stop on the way out or back from Varenna. 45 min from Bergamo, ~\u20ac4.',
+        directions: 'Direct train from Bergamo, ~45 min',
+        energy: 'med', setting: 'outdoor', free: true, price: null, time: '1\u20132 hrs',
+        ourPick: false, timeOfDay: ['morning','afternoon'], duration: 'quick',
+        vibe: ['wander'], repeatWorthy: false },
+    ];
+
+    // ── Restaurants ──
+    const RESTAURANTS = [
+      { id: 'circolino', name: 'Il Circolino', zone: 'alta', price: '\u20ac\u2013\u20ac\u20ac',
+        orderThis: 'Weekday set lunch: starter, pasta, wine, coffee for \u20ac15',
+        detail: 'Local institution. Full of Bergamasque regulars. Book ahead for dinner.' },
+      { id: 'parietti', name: 'Trattoria Parietti', zone: 'alta', price: '\u20ac\u2013\u20ac\u20ac',
+        orderThis: 'Casoncelli, polenta taragna with bacal\u00e0',
+        detail: 'Unfussy, generous, authentic. Full meals \u20ac15\u201325pp.' },
+      { id: 'nonna-alda', name: 'Casoncelli Nonna Alda', zone: 'alta', price: '\u20ac\u2013\u20ac\u20ac',
+        orderThis: 'Handmade casoncelli (family recipe since 1928)',
+        detail: 'If you eat casoncelli once, eat them here or at Circolino.' },
+      { id: 'vino-buono', name: 'Antica Osteria del Vino Buono', zone: 'alta', price: '\u20ac\u20ac',
+        orderThis: 'Seasonal specials with the wine list',
+        detail: 'A step up in price but not in pretension. Good evening meal.' },
+      { id: 'dambrosio', name: "Trattoria d\u2019Ambrosio", zone: 'bassa', price: '\u20ac\u2013\u20ac\u20ac',
+        orderThis: 'Casoncelli, polenta with meat, local cheese',
+        detail: 'Informal osteria. Lunch \u20ac10\u201312, dinner \u20ac22\u201328pp.' },
+      { id: 'la-scagna', name: 'La Scagna', zone: 'bassa', price: '\u20ac\u2013\u20ac\u20ac',
+        orderThis: 'Lunch casoncelli and polenta',
+        detail: 'Particularly good at lunch. Prices reflect the local clientele.' },
+      { id: 'mimi', name: 'Mim\u00ec \u2013 La Casa dei Sapori', zone: 'bassa', price: '\u20ac\u2013\u20ac\u20ac',
+        orderThis: 'Lombard menu \u2014 whatever\u2019s seasonal',
+        detail: 'Casual sibling of Da Mimmo. Cosy, genuine, relaxed evening.' },
+      { id: 'la-ciotola', name: 'La Ciotola', zone: 'bassa', price: '\u20ac',
+        orderThis: 'Good wines by the glass, small plates',
+        detail: 'Unpretentious wine bar. Best spot to feel like a resident.' },
+      { id: 'p40', name: 'P40', zone: 'bassa', price: '\u20ac',
+        orderThis: 'Aperitivo',
+        detail: 'Piazza Pontida. Good local aperitivo option.' },
+      { id: '035', name: '035 \u2013 ZeroThirtyFive', zone: 'bassa', price: '\u20ac',
+        orderThis: 'Evening drinks',
+        detail: 'Named after the Bergamo dialling code. Local favourite.' },
+      { id: 'madonnina', name: 'Trattoria Madonnina', zone: 'milano', price: '\u20ac\u20ac',
+        orderThis: 'Risotto alla Milanese, cotoletta',
+        detail: 'Navigli area. Retro tablecloths, classic Milanese cooking. Dinner ~\u20ac25\u201330pp. Reserve ahead.' },
+      { id: 'navigli-aperitivo', name: 'Navigli aperitivo bars', zone: 'milano', price: '\u20ac',
+        orderThis: 'Any drink (~\u20ac8\u201310) + the free buffet',
+        detail: 'Show up at 18:00 on Naviglio Grande. Both an experience and a meal.' },
+    ];
+
+    // ── Practical ──
+    const PRACTICAL = [
+      { id: 'airport', title: 'Airport Bus', lines: [
+        'ATB Bus 1 from Orio al Serio to city centre \u2014 \u20ac2, ~20 min',
+        'Runs frequently. Pay on the bus or buy at a tabaccheria',
+        'Taxi alternative: ~\u20ac15\u201320, ~15 min' ]},
+      { id: 'funicular', title: 'Funicular', lines: [
+        'Runs frequently from Viale Vittorio Emanuele II up to Citt\u00e0 Alta',
+        '~\u20ac1.70 each way. Combined ticket (funicular + bus) available',
+        'Second funicular: Citt\u00e0 Alta up to San Vigilio',
+        'Or walk up: 15\u201320 min via Porta San Giacomo' ]},
+      { id: 'train-milan', title: 'Train to Milan', lines: [
+        'Bergamo FS \u2192 Milano Centrale (Trenord)',
+        '~\u20ac6 each way, ~50 min, roughly hourly',
+        'Regional tickets valid all day \u2014 no specific departure needed',
+        'Book on Trenord app or station machines',
+        'From Centrale: Metro M3 to Duomo ~15 min (\u20ac2.20/ride, day pass \u20ac7)' ]},
+      { id: 'train-iseo', title: 'Train to Lake Iseo', lines: [
+        'Bergamo \u2192 Iseo via Brescia (change at Brescia)',
+        '~\u20ac7\u20139 each way, ~1h45min total',
+        'Book on Trenord app. ~20 trains daily' ]},
+      { id: 'train-como', title: 'Train to Lake Como', lines: [
+        'Bergamo \u2192 Lecco (direct, ~45 min, ~\u20ac4)',
+        'Then along eastern shore toward Varenna or Como town',
+        'Total ~1h45min\u20132h15min. More transfers than Iseo' ]},
+      { id: 'supermarket', title: 'Supermarket', lines: [
+        'Esselunga on Viale Vittorio Emanuele II (Citt\u00e0 Bassa)',
+        'Large, good quality, well-priced',
+        'Stock wine, cheese, breakfast things, snacks',
+        'Shop on your first evening \u2014 saves a lot across the week' ]},
+      { id: 'departure', title: 'Departure (8 April)', lines: [
+        'Mid-morning flight \u2014 aim for a relaxed start',
+        'Bus 1 from centre to airport (~20 min, \u20ac2)',
+        'Check ATB timetable the evening before',
+        'Allow 90 minutes before your flight',
+        'Taxi backup: ~\u20ac15\u201320 if running late' ]},
+    ];
+
+    const FOODS = [
+      { name: 'Casoncelli alla Bergamasca', desc: 'Stuffed pasta in butter, sage, and pancetta. The essential dish.' },
+      { name: 'Polenta Taragna', desc: 'Buckwheat polenta with local cheese. Darker and nuttier than standard.' },
+      { name: 'Stracciatella gelato', desc: 'Invented in Bergamo. Vanilla with melted dark chocolate ribbons.' },
+      { name: 'Local cheeses', desc: 'Taleggio, Stracchino, Formai de Mut, Branzi. Ask at any market stall.' },
+      { name: 'Aperitivo', desc: 'Order a drink (\u20ac6\u20139), eat from the free buffet. Standard in Lombardy.' },
+    ];
+
+    // ── Helpers ──
+    const DUR_RANK = { quick: 1, half_day: 2, full_day: 3 };
+    const VIBE_LABELS = { romantic: 'romantic', adventurous: 'adventurous', cultural: 'cultural', food_drink: 'food & drink', wander: 'just wander' };
+    const TIME_LABELS = { morning: 'morning', afternoon: 'afternoon', golden_hour: 'golden hour', evening: 'evening' };
+    const DUR_LABELS = { quick: 'under 1 hr', half_day: 'half day', full_day: 'full day' };
+    const ZONE_SHORT = { alta: 'Alta', bassa: 'Bassa', milano: 'Milano', iseo: 'Iseo', como: 'Como' };
+
+    function activityMatches(a, filters) {
+      if (filters.energy && a.energy !== filters.energy) return false;
+      if (filters.setting && a.setting !== filters.setting && a.setting !== 'either') return false;
+      if (filters.freeOnly && !a.free) return false;
+      if (filters.timeOfDay && !a.timeOfDay.includes(filters.timeOfDay)) return false;
+      if (filters.duration && DUR_RANK[a.duration] > DUR_RANK[filters.duration]) return false;
+      if (filters.vibe && !a.vibe.includes(filters.vibe)) return false;
+      if (filters.repeatOnly && !a.repeatWorthy) return false;
+      return true;
+    }
+
+    function filtersToHash(f) {
+      const p = [];
+      if (f.energy) p.push('energy=' + f.energy);
+      if (f.setting) p.push('setting=' + f.setting);
+      if (f.freeOnly) p.push('free=1');
+      if (f.timeOfDay) p.push('time=' + f.timeOfDay);
+      if (f.duration) p.push('dur=' + f.duration);
+      if (f.vibe) p.push('vibe=' + f.vibe);
+      if (f.repeatOnly) p.push('repeat=1');
+      if (f.zone) p.push('zone=' + f.zone);
+      return p.length ? '#' + p.join('&') : '';
+    }
+    function hashToFilters(hash) {
+      const f = { energy:null, setting:null, freeOnly:false, timeOfDay:null, duration:null, vibe:null, repeatOnly:false, zone:null };
+      if (!hash || hash.length < 2) return f;
+      const p = new URLSearchParams(hash.slice(1));
+      if (p.get('energy')) f.energy = p.get('energy');
+      if (p.get('setting')) f.setting = p.get('setting');
+      if (p.get('free')) f.freeOnly = true;
+      if (p.get('time')) f.timeOfDay = p.get('time');
+      if (p.get('dur')) f.duration = p.get('dur');
+      if (p.get('vibe')) f.vibe = p.get('vibe');
+      if (p.get('repeat')) f.repeatOnly = true;
+      if (p.get('zone')) f.zone = p.get('zone');
+      return f;
+    }
+
+    // ── Components ──
+    function Header() {
+      return <div className="header"><div className="header-title">Bergamo</div><div className="header-sub">3 &ndash; 8 Aprile 2026</div></div>;
+    }
+
+    function MoodPicker({ filters, setFilters }) {
+      const [showMore, setShowMore] = useState(false);
+      const toggle = (key, val) => setFilters(f => ({ ...f, [key]: f[key] === val ? null : val }));
+      const toggleBool = (key) => setFilters(f => ({ ...f, [key]: !f[key] }));
+      const extraActive = filters.timeOfDay || filters.duration || filters.vibe || filters.repeatOnly;
+
+      return (
+        <div className="mood-picker">
+          <div className="filter-row-label">Place</div>
+          <div className="filter-row">
+            {Object.entries(ZONE_SHORT).map(([v,l]) => (
+              <button key={v} className={`filter-btn${filters.zone===v?' active':''}`} onClick={()=>toggle('zone',v)}>{l}</button>
+            ))}
+          </div>
+          <div className="filter-row-label">Energy</div>
+          <div className="filter-row">
+            {[['low','low'],['med','medium'],['high',"let's go"]].map(([v,l]) => (
+              <button key={v} className={`filter-btn${filters.energy===v?' active':''}`} onClick={()=>toggle('energy',v)}>{l}</button>
+            ))}
+          </div>
+          <div className="filter-row-label">Setting</div>
+          <div className="filter-row">
+            {[['outdoor','outdoors'],['indoor','indoors']].map(([v,l]) => (
+              <button key={v} className={`filter-btn${filters.setting===v?' active':''}`} onClick={()=>toggle('setting',v)}>{l}</button>
+            ))}
+          </div>
+          <div className="filter-row-label">Budget</div>
+          <div className="filter-row">
+            <button className={`filter-btn${filters.freeOnly?' active':''}`} onClick={()=>toggleBool('freeOnly')}>free only</button>
+            <button className={`filter-btn${!filters.freeOnly?' active':''}`} onClick={()=>toggleBool('freeOnly')}>doesn't matter</button>
+          </div>
+
+          <div className="more-filters-toggle" onClick={() => setShowMore(s => !s)}>
+            <span>More filters{extraActive ? ' \u2022' : ''}</span>
+            <span className={`chevron${showMore ? ' open' : ''}`}>{'\u25BE'}</span>
+          </div>
+          <div className="extra-filters" style={{ maxHeight: showMore ? '300px' : '0px', opacity: showMore ? 1 : 0 }}>
+            <div style={{ paddingTop: '6px' }}>
+              <div className="filter-row-label">Time of day</div>
+              <div className="filter-row">
+                {Object.entries(TIME_LABELS).map(([v,l]) => (
+                  <button key={v} className={`filter-btn${filters.timeOfDay===v?' active':''}`} onClick={()=>toggle('timeOfDay',v)}>{l}</button>
+                ))}
+              </div>
+              <div className="filter-row-label">How long do we have?</div>
+              <div className="filter-row">
+                {Object.entries(DUR_LABELS).map(([v,l]) => (
+                  <button key={v} className={`filter-btn${filters.duration===v?' active':''}`} onClick={()=>toggle('duration',v)}>{l}</button>
+                ))}
+              </div>
+              <div className="filter-row-label">Vibe</div>
+              <div className="filter-row">
+                {Object.entries(VIBE_LABELS).map(([v,l]) => (
+                  <button key={v} className={`filter-btn${filters.vibe===v?' active':''}`} onClick={()=>toggle('vibe',v)}>{l}</button>
+                ))}
+              </div>
+              <div className="filter-row" style={{ marginTop: '4px' }}>
+                <button className={`filter-btn${filters.repeatOnly?' active':''}`} onClick={()=>toggleBool('repeatOnly')}>repeat-worthy only</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ActivityCard({ activity, isExpanded, onToggle, matches, accent, seen, onDismiss }) {
+      const cardRef = useRef(null);
+      const wrapperRef = useRef(null);
+      const touchRef = useRef({ startX: 0, startY: 0, currentX: 0, swiping: false, moved: false });
+
+      const onTouchStart = useCallback((e) => {
+        const t = e.touches[0];
+        touchRef.current = { startX: t.clientX, startY: t.clientY, currentX: 0, swiping: false, moved: false };
+        if (cardRef.current) cardRef.current.style.transition = 'none';
+      }, []);
+
+      const onTouchMove = useCallback((e) => {
+        const t = e.touches[0];
+        const dx = t.clientX - touchRef.current.startX;
+        const dy = t.clientY - touchRef.current.startY;
+        touchRef.current.moved = true;
+        if (!touchRef.current.swiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+          touchRef.current.swiping = true;
+        }
+        if (touchRef.current.swiping) {
+          e.preventDefault();
+          touchRef.current.currentX = dx;
+          if (cardRef.current) {
+            cardRef.current.style.transform = `translateX(${dx}px)`;
+            cardRef.current.style.opacity = Math.max(0, 1 - Math.abs(dx) / 250);
+          }
+        }
+      }, []);
+
+      const onTouchEnd = useCallback(() => {
+        if (touchRef.current.swiping && Math.abs(touchRef.current.currentX) > 100) {
+          const dir = touchRef.current.currentX > 0 ? 1 : -1;
+          if (cardRef.current) {
+            cardRef.current.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+            cardRef.current.style.transform = `translateX(${dir * 400}px)`;
+            cardRef.current.style.opacity = '0';
+          }
+          setTimeout(() => {
+            if (wrapperRef.current) wrapperRef.current.classList.add('dismissing');
+            setTimeout(() => onDismiss(activity.id), 300);
+          }, 250);
+        } else if (touchRef.current.swiping) {
+          if (cardRef.current) {
+            cardRef.current.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+            cardRef.current.style.transform = 'translateX(0)';
+            cardRef.current.style.opacity = matches ? '1' : '';
+          }
+        } else if (!touchRef.current.moved || Math.abs(touchRef.current.currentX) < 5) {
+          // Tap — no swiping happened
+          onToggle();
+        }
+        touchRef.current.swiping = false;
+      }, [matches, onDismiss, activity.id, onToggle]);
+
+      // Desktop click handler (no touch events)
+      const onClick = useCallback((e) => {
+        // Only handle if no touch events fired (desktop)
+        if (!('ontouchstart' in window)) onToggle();
+      }, [onToggle]);
+
+      return (
+        <div ref={wrapperRef} className="activity-card-wrapper" id={`card-${activity.id}`}>
+          <div
+            ref={cardRef}
+            className={`activity-card${matches ? '' : ' faded'}`}
+            style={{ borderLeftColor: accent }}
+            onClick={onClick}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
+            {seen && <div className="seen-dot" />}
+            <div className="card-main">
+              <div className="card-name">
+                {activity.name}
+                {activity.ourPick && <span className="star">{'\u2605'}</span>}
+              </div>
+              <div className="card-detail">{activity.detail}</div>
+              <div className="card-directions">{activity.directions}</div>
+              <div className="card-badges">
+                <span className="badge"><span className="badge-glyph">{activity.free ? '\u25CB' : '\u25CF'}</span>{activity.price || 'Free'}</span>
+                <span className="badge">{activity.time}</span>
+                {activity.repeatWorthy && <span className="badge-repeat">{'\u21BB'}</span>}
+              </div>
+            </div>
+            <div className={`card-expand${isExpanded ? ' open' : ''}`}>
+              <div className="card-tip">{activity.tip}</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ZoneSection({ zone, activities, expandedCard, onToggleExpand, collapsed, onToggleCollapse, filters, seenCards, onDismiss }) {
+      const matchCount = activities.filter(a => activityMatches(a, filters)).length;
+      return (
+        <div className="zone-section">
+          <div className="zone-header" style={{ backgroundColor: zone.bg }} onClick={onToggleCollapse}>
+            <div style={{ display: 'flex', alignItems: 'baseline' }}>
+              <div className="zone-title">{zone.name}</div>
+              <span className="zone-count">{matchCount}/{activities.length}</span>
+            </div>
+            <div className={`zone-chevron${collapsed ? ' collapsed' : ''}`}>{'\u25BE'}</div>
+          </div>
+          <div className="zone-cards" style={{ maxHeight: collapsed ? '0px' : `${activities.length * 250}px`, opacity: collapsed ? 0 : 1 }}>
+            <div className="zone-cards-inner">
+              {activities.map(a => (
+                <ActivityCard key={a.id} activity={a}
+                  isExpanded={expandedCard === a.id}
+                  onToggle={() => onToggleExpand(a.id)}
+                  matches={activityMatches(a, filters)}
+                  accent={zone.accent} seen={seenCards.has(a.id)}
+                  onDismiss={onDismiss} />
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ExploreView({ filters, expandedCard, onToggleExpand, collapsedZones, setCollapsedZones, seenCards, visibleActivities, onDismiss }) {
+      return (
+        <div>
+          {ZONES.map(zone => {
+            // Hide zone entirely if zone filter is active and doesn't match
+            if (filters.zone && filters.zone !== zone.id) return null;
+            const zoneActivities = visibleActivities.filter(a => a.zone === zone.id);
+            if (zoneActivities.length === 0) return null;
+            return (
+              <ZoneSection key={zone.id} zone={zone} activities={zoneActivities}
+                expandedCard={expandedCard}
+                onToggleExpand={onToggleExpand}
+                collapsed={!!collapsedZones[zone.id]}
+                onToggleCollapse={() => setCollapsedZones(prev => ({ ...prev, [zone.id]: !prev[zone.id] }))}
+                filters={filters} seenCards={seenCards} onDismiss={onDismiss} />
+            );
+          })}
+        </div>
+      );
+    }
+
+    function PracticalCard({ item }) {
+      return (
+        <div className="practical-card">
+          <div className="practical-title">{item.title}</div>
+          {item.lines.map((line, i) => <div key={i} className="practical-line">{line}</div>)}
+        </div>
+      );
+    }
+    function RestaurantCard({ r }) {
+      return (
+        <div className="restaurant-card">
+          <div><span className="restaurant-name">{r.name}</span><span className="restaurant-price">{r.price}</span></div>
+          <div className="restaurant-order">{r.orderThis}</div>
+          <div className="restaurant-detail">{r.detail}</div>
+        </div>
+      );
+    }
+    function PracticalView() {
+      const rZones = [{ id:'alta', name:'Citt\u00e0 Alta' },{ id:'bassa', name:'Citt\u00e0 Bassa' },{ id:'milano', name:'Milano' }];
+      return (
+        <div>
+          <div className="section-divider">Getting Around</div>
+          <div className="practical-section">{PRACTICAL.map(item => <PracticalCard key={item.id} item={item} />)}</div>
+          <div className="section-divider">What to Order</div>
+          <div className="practical-section">
+            <div className="food-sheet">{FOODS.map((f,i) => <div key={i} className="food-item"><div className="food-name">{f.name}</div><div className="food-desc">{f.desc}</div></div>)}</div>
+          </div>
+          <div className="section-divider">Restaurants</div>
+          <div className="practical-section">
+            {rZones.map(zone => {
+              const zr = RESTAURANTS.filter(r => r.zone === zone.id);
+              if (!zr.length) return null;
+              return <div key={zone.id}><div className="restaurant-zone-label">{zone.name}</div>{zr.map(r => <RestaurantCard key={r.id} r={r} />)}</div>;
+            })}
+          </div>
+        </div>
+      );
+    }
+    function TabBar({ activeTab, setActiveTab }) {
+      return (
+        <div className="tab-bar">
+          <div className={`tab${activeTab==='explore'?' active':''}`} onClick={()=>setActiveTab('explore')}><span className="tab-icon">{'\u25C8'}</span>Explore</div>
+          <div className={`tab${activeTab==='practical'?' active':''}`} onClick={()=>setActiveTab('practical')}><span className="tab-icon">{'\u2261'}</span>Practical</div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('explore');
+      const [filters, setFilters] = useState(() => hashToFilters(window.location.hash));
+      const [expandedCard, setExpandedCard] = useState(null);
+      const [collapsedZones, setCollapsedZones] = useState({});
+      const [dismissed, setDismissed] = useState(new Set());
+      const [seenCards, setSeenCards] = useState(() => {
+        try { return new Set(JSON.parse(sessionStorage.getItem('bergamo-seen') || '[]')); } catch { return new Set(); }
+      });
+      const [undoItem, setUndoItem] = useState(null);
+      const undoTimer = useRef(null);
+
+      useEffect(() => {
+        const h = filtersToHash(filters);
+        if (window.location.hash !== h) window.history.replaceState(null, '', h || window.location.pathname);
+      }, [filters]);
+      useEffect(() => {
+        const handler = () => setFilters(hashToFilters(window.location.hash));
+        window.addEventListener('hashchange', handler);
+        return () => window.removeEventListener('hashchange', handler);
+      }, []);
+
+      const handleToggleExpand = useCallback((id) => {
+        setExpandedCard(prev => {
+          const next = prev === id ? null : id;
+          if (next) {
+            setSeenCards(s => { const ns = new Set(s); ns.add(id); try { sessionStorage.setItem('bergamo-seen', JSON.stringify([...ns])); } catch {} return ns; });
+          }
+          return next;
+        });
+      }, []);
+
+      const handleDismiss = useCallback((id) => {
+        const activity = ACTIVITIES.find(a => a.id === id);
+        setDismissed(d => { const n = new Set(d); n.add(id); return n; });
+        setUndoItem(activity);
+        if (undoTimer.current) clearTimeout(undoTimer.current);
+        undoTimer.current = setTimeout(() => setUndoItem(null), 4000);
+      }, []);
+      const handleUndo = useCallback(() => {
+        if (undoItem) {
+          setDismissed(d => { const n = new Set(d); n.delete(undoItem.id); return n; });
+          setUndoItem(null);
+          if (undoTimer.current) clearTimeout(undoTimer.current);
+        }
+      }, [undoItem]);
+
+      const visibleActivities = ACTIVITIES.filter(a => !dismissed.has(a.id));
+
+      const handleSurprise = useCallback(() => {
+        const pool = visibleActivities.filter(a => {
+          if (filters.zone && a.zone !== filters.zone) return false;
+          return activityMatches(a, filters);
+        });
+        if (!pool.length) return;
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        setCollapsedZones(prev => ({ ...prev, [pick.zone]: false }));
+        setExpandedCard(pick.id);
+        setSeenCards(s => { const ns = new Set(s); ns.add(pick.id); try { sessionStorage.setItem('bergamo-seen', JSON.stringify([...ns])); } catch {} return ns; });
+        setTimeout(() => {
+          const el = document.getElementById(`card-${pick.id}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const card = el.querySelector('.activity-card');
+            if (card) { card.classList.remove('highlighted'); void card.offsetWidth; card.classList.add('highlighted'); setTimeout(() => card.classList.remove('highlighted'), 1500); }
+          }
+        }, 100);
+      }, [visibleActivities, filters]);
+
+      return (
+        <div>
+          <Header />
+          {activeTab === 'explore' && <MoodPicker filters={filters} setFilters={setFilters} />}
+          {activeTab === 'explore'
+            ? <ExploreView filters={filters} expandedCard={expandedCard}
+                onToggleExpand={handleToggleExpand}
+                collapsedZones={collapsedZones} setCollapsedZones={setCollapsedZones}
+                seenCards={seenCards} visibleActivities={visibleActivities} onDismiss={handleDismiss} />
+            : <PracticalView />}
+          {activeTab === 'explore' && <button className="surprise-fab" onClick={handleSurprise}>Surprise me</button>}
+          {undoItem && <div className="undo-toast"><span>Dismissed {undoItem.name}</span><button className="undo-btn" onClick={handleUndo}>Undo</button></div>}
+          <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "Bergamo Guide \u00b7 April 2026",
+  "short_name": "Bergamo",
+  "description": "Pocket travel guide for Bergamo",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5F0E8",
+  "theme_color": "#2C2520",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
