@@ -184,15 +184,18 @@
     }
 
     /* Drag to reorder */
-    .myday-card-drag { position: relative; display: flex; align-items: stretch; margin-bottom: 8px; }
+    .myday-card-drag { position: relative; display: flex; align-items: stretch; margin-bottom: 8px; transition: transform 0.25s ease, opacity 0.25s ease; }
     .myday-card-drag .activity-card-wrapper { flex: 1; margin-bottom: 0; }
-    .myday-card-drag.dragging { opacity: 0.85; z-index: 10; }
-    .myday-card-drag.dragging .activity-card { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: scale(1.02); }
+    .myday-card-drag.dragging { opacity: 0.8; z-index: 10; transform: scale(1.03); }
+    .myday-card-drag.dragging .activity-card { box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .myday-card-drag.drag-above { transform: translateY(8px); }
+    .myday-card-drag.drag-below { transform: translateY(-8px); }
     .myday-drag-handle {
       width: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-      color: var(--text-light); font-size: 16px; cursor: grab; touch-action: none;
+      color: var(--text-light); font-size: 18px; cursor: grab; touch-action: none;
       -webkit-tap-highlight-color: transparent; user-select: none;
     }
+    .myday-drag-handle:active { color: var(--text-muted); }
 
     /* Surprise Me */
     .surprise-fab {
@@ -830,10 +833,9 @@
       const touchRef = useRef({ startX: 0, startY: 0, currentX: 0, swiping: false, moved: false });
 
       const onTouchStart = useCallback((e) => {
-        if (disableSwipe) return;
         const t = e.touches[0];
         touchRef.current = { startX: t.clientX, startY: t.clientY, currentX: 0, swiping: false, moved: false };
-        if (cardRef.current) cardRef.current.style.transition = 'none';
+        if (!disableSwipe && cardRef.current) cardRef.current.style.transition = 'none';
       }, [disableSwipe]);
 
       const onTouchMove = useCallback((e) => {
@@ -903,14 +905,14 @@
             className={`activity-card${matches ? '' : ' faded'}`}
             style={{ borderLeftColor: accent }}
             onClick={onClick}
-            onTouchStart={disableSwipe ? undefined : onTouchStart}
+            onTouchStart={onTouchStart}
             onTouchMove={disableSwipe ? undefined : onTouchMove}
-            onTouchEnd={disableSwipe ? undefined : onTouchEnd}
+            onTouchEnd={onTouchEnd}
           >
             {onToggleMyDay && <button className={`myday-toggle${inMyDay ? ' added' : ''}`} onClick={handleMyDayClick} onTouchEnd={handleMyDayTouch}>{inMyDay ? '\u2713' : '+'}</button>}
             {seen && <div className="seen-dot" />}
             <div className="card-main">
-              <div className="card-name" style={onToggleMyDay ? { paddingRight: '32px' } : undefined}>
+              <div className="card-name" style={onToggleMyDay ? { paddingRight: '36px' } : undefined}>
                 {activity.name}
                 {activity.ourPick && <span className="star">{'\u2605'}</span>}
               </div>
